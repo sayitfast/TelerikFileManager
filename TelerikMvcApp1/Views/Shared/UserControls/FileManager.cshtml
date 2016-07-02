@@ -1,0 +1,70 @@
+﻿@using TelerikMvcApp1.Models
+@model UploadControlInfo
+<script type="text/javascript">
+    function getFileUrl(imageUrl) {
+        $.get(imageUrl.replace('&mode=1', '').trim() + '&mode=2', function (data) {
+            $('#txtFileUrl_' + '@Model.Id').val(data);
+            $('#' + '@Model.UploadControlId').val(data);
+        });
+        $("#myWindow_" + '@Model.Id').data("kendoWindow").close();
+    }
+</script>
+<div id="ImageBrowser_@Model.UploadControlId" class="image_browser" data-file-browser-type="@Model.BrowserType" data-uploadcontrol="@Model.UploadControlId"></div>
+@if (Model.BrowserType == FileBrowserType.Image)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#ImageBrowser_@Model.UploadControlId").kendoImageBrowser({
+                fileTypes: "*.gif,*.jpg,*.png,*.jpeg, *.pdf",
+                transport: {
+                    read: {
+                        url: "/ImageBrowser/Read",
+                        type: "POST"
+                    },
+                    destroy: {
+                        url: "/ImageBrowser/Destroy",
+                        type: "POST"
+                    },
+                    create: {
+                        url: "/ImageBrowser/Create",
+                        type: "POST"
+                    },
+                    thumbnailUrl: "/ImageBrowser/Thumbnail",
+                    uploadUrl: "/ImageBrowser/Upload",
+                    imageUrl: "/ImageBrowser/Image?path={0}"
+                },
+                apply: function () {
+                    getFileUrl(this.value());
+                }
+            });
+        });
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#ImageBrowser_@Model.UploadControlId").kendoFileBrowser({
+                transport: {
+                    read: {
+                        url: "/FileBrowser/Read",
+                        type: "POST"
+                    },
+                    destroy: {
+                        url: "/FileBrowser/Destroy",
+                        type: "POST"
+                    },
+                    create: {
+                        url: "/FileBrowser/Create",
+                        type: "POST"
+                    },
+                    uploadUrl: "/FileBrowser/Upload",
+                    fileUrl: "/FileBrowser/File?fileName={0}&mode=2"
+                },
+                apply: function () {
+                    getFileUrl(this.value());
+                }
+            });
+        });
+    </script>
+}
